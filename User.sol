@@ -20,6 +20,8 @@ contract user{
         bool exists;
         //address userAddress;
         address[] friends;
+        uint amountOwed;
+        uint amountToRecieve;
        
     } 
     
@@ -68,7 +70,7 @@ contract user{
     //@dev: register a user
     function register(string memory _username, string memory _password) public registerOnlyOnce(msg.sender){
         
-        users memory newUser = users(_username,_password,true,new address[](0));
+        users memory newUser = users(_username,_password,true,new address[](0),0,0);
         
         addressToUserMapping[msg.sender] = newUser;
     }

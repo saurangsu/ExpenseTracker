@@ -4,7 +4,7 @@ import "./User.sol";
 
 contract transactions is user{
     
-    uint transactionId = 0;
+    //uint transactionId = 0;
     
     enum ExpenseTypes {DEFAULT, EQUAL, PERCENTAGE, SHARE}
     ExpenseTypes expenseType;
@@ -13,9 +13,11 @@ contract transactions is user{
         
         address[] spenders;
         uint expenseAmount;
-        
+        uint[] splits;
+        address payer;
+        uint[] distributedAmounts;
     }
-    
+    uint[] expensesList;
     mapping(uint => expense) expenseMapper;    
 
     //@dev: for every element in the _friends array, verify if that friend exists using FN doesFriendExist
@@ -62,9 +64,51 @@ contract transactions is user{
     }
     
     //@dev: function to add expenses
-    function addExpense(uint expenseAmount, address[] memory spenders) public checkUserValidity() checkFriendList(spenders){
-        expense memory currentExpense = expense(spenders,expenseAmount);
-        expenseMapper[transactionId++] = currentExpense;
+    function addExpense(uint expenseAmount, ExpenseTypes _type, address[] memory spenders, uint[] memory splits) public checkUserValidity() checkFriendList(spenders){
+       
+        //uint[] memory splitAmount;
+       
+        uint transactionId = expensesList.length;
+        expensesList.push(transactionId);
+        expense memory currentExpense = expense(spenders,expenseAmount, splits,msg.sender,new uint[](0));
         
+        expenseMapper[transactionId] = currentExpense;
+        
+ 
+        if (_type == ExpenseTypes.EQUAL){
+           uint splitPerPerson = expenseAmount/spenders.length;
+           for(uint i=0;i<spenders.length;i++){
+               //splitAmount[i].push(splitPerPerson);
+               expenseMapper[transactionId].distributedAmounts.push(splitPerPerson);
+              }
+
+       }else if(_type == ExpenseTypes.SHARE){
+           require(splits.length>0 && spenders.length == splits.length, "Shares per person hasn't been recoreded");
+           uint totalShares = 0; 
+           for(uint i=0;i<splits.length;i++){
+           
+           totalShares = totalShares + splits[i];
+      
+           }
+           
+           for(uint i=0;i<splits.length;i++){
+           
+           
+           expenseMapper[transactionId].distributedAmounts
+           .push((expenseAmount/totalShares)*splits[i]);         
+           }
+
+       }
+
+
+    //transactionId = transactionId + 1;
+    
+
+
+    }
+
+
+    function showBalance() public returns(uint){
+        return addressToUserMapping[msg.sender].amountOwed;
     }
 }
