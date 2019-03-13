@@ -100,23 +100,25 @@ contract transactions is user{
         
         expenseMapper[txDetails] = currentExpense;
         
- 
+        //@dev: if the splitting option is set as EQUAL
         if (_type == ExpenseTypes.EQUAL){
            uint splitPerPerson = expenseAmount/spenders.length;
            for(uint i=0;i<spenders.length;i++){
                //splitAmount[i].push(splitPerPerson);
                expenseMapper[txDetails].distributedAmounts.push(splitPerPerson);
               }
-
+        //@dev: if the splitting option is set as SHARES
        }else if(_type == ExpenseTypes.SHARE){
            require(splits.length>0 && spenders.length == splits.length, "Shares per person hasn't been recoreded");
            uint totalShares = 0; 
+           //@dev: assigns shares per person - in the same order as spenders
            for(uint i=0;i<splits.length;i++){
            
            totalShares = totalShares + splits[i];
       
            }
            //uint temp = transactionId;
+           //@dev: assigns distributed amounts per person
            for(uint i=0;i<splits.length;i++){
            
            //if(temp == 0 ){
@@ -127,7 +129,7 @@ contract transactions is user{
        }else{
            
        }
-
+    //@dev: some logical error while trying to use a unique uint as a transaction ID and use that to populate an array containing list of transactions. 
     //transactionId++;
     //transactionId = transactionId + 1;
     //expensesList.push(currentExpense);
